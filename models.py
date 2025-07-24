@@ -43,7 +43,7 @@ def validate_user(username, password):
     with app.app_context():
         user = User.query.filter_by(username=username).first()
         if user and user.check_password(password):
-            return True
+            return user.type
         else:
             return False
 

@@ -11,7 +11,9 @@ def login():
     username = data.get("username")
     password = data.get("password")
 
-    if models.validate_user(username, password):
-        return jsonify({"success": True, "token": "fake-jwt-token", "username": username, "publicKey": "fake-public-key"}), 200
+    type = models.validate_user(username, password)
+    print(type)
+    if type:
+        return jsonify({"success": True, "token": "fake-jwt-token", "username": username, "publicKey": "fake-public-key", "type" : type}), 200
     else:
         return jsonify({"success": False, "message": "Credenziali errate"}), 401
