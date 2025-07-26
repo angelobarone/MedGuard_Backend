@@ -12,7 +12,7 @@ def login():
     password = data.get("password")
 
     type = models.validate_user(username, password)
-    print(type)
+    print("L'utente " + username + "ha effettuato il login con auth: " + type)
     if type:
         return jsonify({"success": True, "token": "fake-jwt-token", "username": username, "publicKey": "fake-public-key", "type" : type}), 200
     else:
