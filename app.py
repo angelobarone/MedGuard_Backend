@@ -22,12 +22,9 @@ def login():
 def checkAuthorization():
     data = request.get_json()
     username = data.get("username")
-    return userModels.check_authorization(username)
+    hash = userModels.check_authorization(username)
+    return jsonify({"success": True, "hash": hash}), 200
 
-@app.route('/uploadData', methods=['POST']){
 
-}
-
-@app.route('/downloadData', methods=['POST']){
-
-}
+if __name__ == "__main__":
+    app.run(port=5000)
