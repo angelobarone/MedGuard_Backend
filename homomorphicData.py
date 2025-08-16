@@ -6,6 +6,8 @@ from extensions import db
 class Aggregati(db.Model):
     provincia = db.Column(db.String, primary_key=True)
     malattia = db.Column(db.String, primary_key=True)
+    mese = db.Column(db.String, primary_key=True)
+    anno = db.Column(db.String, primary_key=True)
 
     count_sum = db.Column(db.Text, nullable=False)
     eta_sum = db.Column(db.Text, nullable=False)
@@ -19,6 +21,8 @@ class Aggregati(db.Model):
     difficolta_sum = db.Column(db.Text, nullable=False)
     stanchezza_sum = db.Column(db.Text, nullable=False)
     genere_sum = db.Column(db.Text, nullable=False)
+    peso_sum = db.Column(db.Text, nullable=False)
+    altezza_sum = db.Column(db.Text, nullable=False)
 
 def hex_to_int(hex_str:str) -> int:
     return int(hex_str, 16)
@@ -35,17 +39,21 @@ def homomorhic_sum(c1, c2, public_key):
     return int_to_hex(somma)
 
 
-def upload_data(app, enc_data, public_key):
+def upload_homomorphic_data(app, enc_data, public_key):
     with app.app_context():
         provincia = enc_data.get("provincia")
         malattia = enc_data.get("malattia")
+        mese = enc_data.get("mese")
+        anno = enc_data.get("anno")
 
-        row = Aggregati.query.filter_by(provincia=provincia, malattia=malattia).first()
+        row = Aggregati.query.filter_by(provincia=provincia, malattia=malattia, mese=mese, anno=anno).first()
 
         if not row:
             row = Aggregati(
                 provincia=provincia,
                 malattia=malattia,
+                mese=mese,
+                anno=anno,
                 count_sum=enc_data.get("count_sum"),
                 eta_sum=enc_data.get("eta_sum"),
                 colesterolo_sum=enc_data.get("colesterolo_sum"),
@@ -56,28 +64,31 @@ def upload_data(app, enc_data, public_key):
                 tosse_sum=enc_data.get("tosse_sum"),
                 difficolta_sum=enc_data.get("difficolta_sum"),
                 stanchezza_sum=enc_data.get("stanchezza_sum"),
-                genere_sum=enc_data.get("genere_sum")
+                genere_sum=enc_data.get("genere_sum"),
+                peso_sum=enc_data.get("peso_sum"),
+                altezza_sum=enc_data.get("altezza_sum")
             )
             db.session.add(row)
 
         else:
             for field in [
                 "count_sum", "eta_sum", "colesterolo_sum", "pressione_sum", "glucosio_sum",
-                "fumatore_sum", "febbre_sum", "tosse_sum", "difficolta_sum", "stanchezza_sum", "genere_sum"
+                "fumatore_sum", "febbre_sum", "tosse_sum", "difficolta_sum", "stanchezza_sum", "genere_sum", "peso_sum", "altezza_sum"
             ]:
-                #i ciphertexts are stored as strings, so we need to decode them before we can add them to the sum
                 setattr(row, field, homomorhic_sum(getattr(row, field), enc_data[field], public_key))
 
         db.session.commit()
         return True
 
-def get_data(app):
+def get_homomorphic_data(app):
     with app.app_context():
         out = []
         for row in Aggregati.query.all():
             out.append({
                 "provincia": row.provincia,
                 "malattia": row.malattia,
+                "mese": row.mese,
+                "anno": row.anno,
                 "count_sum": row.count_sum,
                 "eta_sum": row.eta_sum,
                 "colesterolo_sum":row.colesterolo_sum,
@@ -88,6 +99,8 @@ def get_data(app):
                 "tosse_sum": row.tosse_sum,
                 "difficolta_sum": row.difficolta_sum,
                 "stanchezza_sum": row.stanchezza_sum,
-                "genere_sum": row.genere_sum
+                "genere_sum": row.genere_sum,
+                "peso_sum": row.peso_sum,
+                "altezza_sum": row.altezza_sum
             })
         return out
