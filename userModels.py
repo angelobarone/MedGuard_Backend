@@ -4,11 +4,8 @@ from flask_sqlalchemy import SQLAlchemy
 from flask import Flask
 import requests
 from werkzeug.security import generate_password_hash, check_password_hash
+from extensions import db
 
-app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'  # database SQLite in un file locale
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-db = SQLAlchemy(app)
 fake = Faker()
 
 class User(db.Model):
@@ -25,22 +22,7 @@ class User(db.Model):
         return check_password_hash(self.password_hash, password)
 
 
-def initialize_database():
-    for _ in range(10):
-        username = fake.user_name()
-        password = fake.password(length=10)
-        user = User(username=username, clear_password=password)
-        user.set_password(password)
-        db.session.add(user)
-        db.session.commit()
-
-def check_database():
-    with app.app_context():
-        if not os.path.exists("instance/users.db"):
-            db.create_all()
-            initialize_database()
-
-def validate_user(username, password):
+def validate_user(app, username, password):
     with app.app_context():
         user = User.query.filter_by(username=username).first()
         if user and user.check_password(password):
@@ -48,7 +30,7 @@ def validate_user(username, password):
         else:
             return False
 
-def check_authorization(username):
+def check_authorization(app, username):
     with app.app_context():
         user = User.query.filter_by(username=username).first()
         if user.type == "S":
@@ -56,7 +38,7 @@ def check_authorization(username):
         else:
             return False
 
-def create_user(username, password, type):
+def create_user(app, username, password, type):
     with app.app_context():
         existing = User.query.filter_by(username=username).first()
         if existing:
