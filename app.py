@@ -53,10 +53,8 @@ def encDataReceiver():
     data = request.get_json()
     username = data.get("clinic")
     enc_data = data.get("data")
-    n_str = "12345678901234567890"
-    g_str = "12345678901234567890"
+    n_str = data.get("n")
     n = int(n_str)
-    g = int(g_str)
     pubkey = paillier.PaillierPublicKey(n)
 
     if allData.upload_data(app, username, enc_data):
