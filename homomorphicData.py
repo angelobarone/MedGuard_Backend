@@ -1,6 +1,3 @@
-from phe import paillier
-import base64
-import json
 from extensions import db
 
 class Aggregati(db.Model):
