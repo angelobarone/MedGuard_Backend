@@ -1,10 +1,11 @@
 from extensions import db
 
+# mese = db.Column(db.String, primary_key=True)
+# anno = db.Column(db.String, primary_key=True)
+
 class Aggregati(db.Model):
-    provincia = db.Column(db.String, primary_key=True)
+    macroarea = db.Column(db.String, primary_key=True)
     malattia = db.Column(db.String, primary_key=True)
-    mese = db.Column(db.String, primary_key=True)
-    anno = db.Column(db.String, primary_key=True)
 
     count_sum = db.Column(db.Text, nullable=False)
     eta_sum = db.Column(db.Text, nullable=False)
@@ -41,19 +42,20 @@ def homomorhic_sum(c1, c2, public_key):
 
 def upload_homomorphic_data(app, enc_data, public_key):
     with app.app_context():
-        provincia = enc_data.get("provincia")
-        malattia = enc_data.get("malattia")
-        mese = enc_data.get("mese")
-        anno = enc_data.get("anno")
+        mac = enc_data.get("macroarea")
+        mal = enc_data.get("malattia")
+        # mese = enc_data.get("mese")
+        # anno = enc_data.get("anno")
 
-        row = Aggregati.query.filter_by(provincia=provincia, malattia=malattia, mese=mese, anno=anno).first()
+        # mese=mese, anno=anno
+        row = Aggregati.query.filter_by(macroarea=mac, malattia=mal).first()
 
         if not row:
+            # mese=mese,
+            # anno=anno,
             row = Aggregati(
-                provincia=provincia,
-                malattia=malattia,
-                mese=mese,
-                anno=anno,
+                macroarea=mac,
+                malattia=mal,
                 count_sum=enc_data.get("count_sum"),
                 eta_sum=enc_data.get("eta_sum"),
                 colesterolo_sum=enc_data.get("colesterolo_sum"),
@@ -85,10 +87,8 @@ def get_homomorphic_data(app):
         out = []
         for row in Aggregati.query.all():
             out.append({
-                "provincia": row.provincia,
+                "macroarea": row.macroarea,
                 "malattia": row.malattia,
-                "mese": row.mese,
-                "anno": row.anno,
                 "count_sum": row.count_sum,
                 "eta_sum": row.eta_sum,
                 "colesterolo_sum":row.colesterolo_sum,

@@ -3,7 +3,6 @@ import os
 from faker import Faker
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-from flask_sqlalchemy import SQLAlchemy
 from phe import paillier
 import allData
 import homomorphicData
