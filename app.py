@@ -1,5 +1,6 @@
 import os
 
+import requests
 from faker import Faker
 from flask import Flask, request, jsonify
 from flask_cors import CORS
@@ -36,7 +37,14 @@ def login():
     type = userModels.validate_user(app, username, password)
     print("L'utente " + username + "ha effettuato il login con auth: " + type)
     if type:
-        return jsonify({"success": True, "token": "fake-jwt-token", "username": username, "type" : type}), 200
+        if type == "S":
+            url = "http://127.0.0.1:5001/setToken"
+            data = {"username": username}
+            response = requests.post(url, json=data)
+            token = response.json()["token"]
+            return jsonify({"success": True, "token": token, "username": username, "type" : type}), 200
+        else:
+            return jsonify({"success": True, "token": "fake-jwt-token", "username": username, "type" : type}), 200
     else:
         return jsonify({"success": False, "message": "Credenziali errate"}), 401
 

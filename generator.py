@@ -9,7 +9,6 @@ macroarea = ["Nord", "Centro", "Sud"]
 
 malattie = ["Diabete", "Ipertensione", "Asma", "Influenza", "Covid-19"]
 
-#mesi = ["Gennaio", "Febbraio", "Marzo", "Aprile", "Maggio", "Giugno", "Luglio", "Agosto", "Settembre", "Ottobre", "Novembre", "Dicembre"]
 url = "http://127.0.0.1:5001/getPublicKey"
 data = {"username": "admin"}
 
@@ -43,11 +42,8 @@ def genera_record():
     enc_data =  {
         "macroarea": random.choice(macroarea),
         "malattia": random.choice(malattie),
-        #"mese": random.choice(mesi),
-        #"anno": random.randint(2020, 2025),
-        # Campi di somma (richiesti dal DB)
-        "count_sum": hex(pubkey.encrypt(1).ciphertext()),  # Ogni record conta come 1 paziente
-        "eta_sum": hex(pubkey.encrypt(eta_val).ciphertext()),  # Somma iniziale = valore singolo
+        "count_sum": hex(pubkey.encrypt(1).ciphertext()),
+        "eta_sum": hex(pubkey.encrypt(eta_val).ciphertext()),
         "colesterolo_sum": hex(pubkey.encrypt(colesterolo_val).ciphertext()),
         "pressione_sum": hex(pubkey.encrypt(pressione_val).ciphertext()),
         "glucosio_sum": hex(pubkey.encrypt(glicemia_val).ciphertext()),
@@ -56,10 +52,9 @@ def genera_record():
         "tosse_sum": hex(pubkey.encrypt(tosse_val).ciphertext()),
         "difficolta_sum": hex(pubkey.encrypt(difficolta_val).ciphertext()),
         "stanchezza_sum": hex(pubkey.encrypt(stanchezza_val).ciphertext()),
-        # Se richiesti dal DB, aggiungi anche questi con valori default
-        "genere_sum": hex(pubkey.encrypt(genere_val).ciphertext()),  # Sostituisci con valore appropriato
-        "peso_sum": hex(pubkey.encrypt(peso_val).ciphertext()),    # Sostituisci con valore appropriato
-        "altezza_sum": hex(pubkey.encrypt(altezza_val).ciphertext())   # Sostituisci con valore appropriato
+        "genere_sum": hex(pubkey.encrypt(genere_val).ciphertext()),
+        "peso_sum": hex(pubkey.encrypt(peso_val).ciphertext()),
+        "altezza_sum": hex(pubkey.encrypt(altezza_val).ciphertext())
     }
     return enc_data
 
