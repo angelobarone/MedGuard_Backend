@@ -7,6 +7,7 @@ from flask_cors import CORS
 from phe import paillier
 import allData
 import homomorphicData
+import publishedData
 import userModels
 from extensions import db
 app = Flask(__name__)
@@ -35,7 +36,7 @@ def login():
     password = data.get("password")
 
     type = userModels.validate_user(app, username, password)
-    print("L'utente " + username + "ha effettuato il login con auth: " + type)
+    print("L'utente " + username + " ha effettuato il login con auth: " + type)
     if type:
         if type == "S":
             url = "http://127.0.0.1:5001/setToken"
@@ -73,6 +74,20 @@ def encDataReceiver():
 @app.route('/encDataSender', methods=['POST'])
 def encDataSender():
     data = homomorphicData.get_homomorphic_data(app)
+    return jsonify({"success": True, "data": data}), 200
+
+@app.route('/PublishData', methods=['POST'])
+def PublishData():
+    data = request.get_json()
+    payload = data.get("payload", {})
+    if publishedData.upload_data(app, payload):
+        return jsonify({"success": True}), 200
+    else:
+        return jsonify({"success": False}), 450
+
+@app.route('/getPublishedData', methods=['GET'])
+def getPublishedData():
+    data = publishedData.get_data(app)
     return jsonify({"success": True, "data": data}), 200
 
 if __name__ == "__main__":

@@ -44,15 +44,10 @@ def upload_homomorphic_data(app, enc_data, public_key):
     with app.app_context():
         mac = enc_data.get("macroarea")
         mal = enc_data.get("malattia")
-        # mese = enc_data.get("mese")
-        # anno = enc_data.get("anno")
 
-        # mese=mese, anno=anno
         row = Aggregati.query.filter_by(macroarea=mac, malattia=mal).first()
 
         if not row:
-            # mese=mese,
-            # anno=anno,
             row = Aggregati(
                 macroarea=mac,
                 malattia=mal,
