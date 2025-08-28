@@ -1,6 +1,6 @@
-# MedGuard - Backend
+# MedGuard - Central Server
 
-Il **Backend** del progetto universitario **MedGuard** gestisce l’autenticazione degli utenti e la ricezione dei dati sanitari cifrati dai client.  
+Il **Central Server** del progetto universitario **MedGuard** gestisce l’autenticazione degli utenti e la ricezione dei dati sanitari cifrati dai client.  
 Si occupa inoltre di archiviare i dati cifrati e prepararli per l’elaborazione omomorfica, senza mai accedere ai dati in chiaro.
 
 ## 🚀 Tecnologie
