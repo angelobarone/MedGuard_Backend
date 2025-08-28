@@ -29,9 +29,6 @@ def int_to_hex(c: int) -> str:
     return format(c, 'x')
 
 def homomorhic_sum(c1, c2, public_key):
-    print(c1)
-    print(c2)
-    print(public_key.n)
     i1 = hex_to_int(c1)
     i2 = hex_to_int(c2)
 
