@@ -6,6 +6,7 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 from phe import paillier
 import allData
+import generator
 import homomorphicData
 import publishedData
 import userModels
@@ -31,6 +32,7 @@ with app.app_context():
             user.set_password(password)
             db.session.add(user)
             db.session.commit()
+        generator.genera_dataset(100)
 
 @app.route('/login', methods=['POST'])
 def login():
