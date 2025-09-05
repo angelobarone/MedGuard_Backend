@@ -21,6 +21,9 @@ with app.app_context():
      if not os.path.exists("instance/medguard.db"):
         db.create_all()
         print("Database creato.")
+        username1 = "angelo"
+        password1 = "barone"
+        user = userModels.create_user(app, username1, password1, "S")
         for _ in range(10):
             username = fake.user_name()
             password = fake.password(length=10)
@@ -39,7 +42,8 @@ def login():
     print("L'utente " + username + " ha effettuato il login con auth: " + type)
     if type:
         if type == "S":
-            url = "http://127.0.0.1:5001/setToken"
+            #"http://127.0.0.1:5001/setToken"
+            url = "https://medguard-trustedautority.onrender.com/setToken"
             data = {"username": username}
             response = requests.post(url, json=data)
             token = response.json()["token"]

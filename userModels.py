@@ -48,7 +48,8 @@ def create_user(app, username, password, type):
         user = User(username=username, clear_password=password, type=type)
         user.set_password(password)
         if type == "S":
-            url = "http://127.0.0.1:5001/addAuthUser"
+            # "http://127.0.0.1:5001/addAuthUser"
+            url = "https://medguard-trustedautority.onrender.com/addAuthUser"
             data = {"username": username, "password": user.password_hash}
             requests.post(url, json=data)
         db.session.add(user)
