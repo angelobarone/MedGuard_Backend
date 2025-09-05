@@ -7,7 +7,7 @@ import homomorphicData
 
 macroarea = ["Nord", "Centro", "Sud"]
 
-malattie = ["Diabete", "Ipertensione", "Asma", "Influenza", "Covid-19"]
+malattie = ["Diabete", "Ipertensione", "Asma", "Influenza", "Covid-19", "Bronchite", "Artrosi", "Gastrite", "Osteoporosi", "Dermatite"]
 
 url = "http://127.0.0.1:5001/getPublicKey"
 data = {"username": "admin"}
@@ -67,5 +67,5 @@ def genera_dataset(n):
 
 # Esempio: genera 50 record e salvali in CSV
 if __name__ == "__main__":
-    genera_dataset(50)
+    genera_dataset(100)
 

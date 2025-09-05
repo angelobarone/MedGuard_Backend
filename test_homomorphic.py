@@ -1,3 +1,5 @@
+import time
+
 import pytest
 from flask import Flask
 from phe import paillier, EncryptedNumber
@@ -74,6 +76,7 @@ def test_upload_and_aggregate(app, paillier_keys):
         "peso_sum": encrypt_to_hex(public_key, 70),
         "altezza_sum": encrypt_to_hex(public_key, 175),
     }
+
     upload_homomorphic_data(app, enc_data1, public_key)
     # Secondo inserimento con valori diversi
     enc_data2 = {
@@ -81,7 +84,12 @@ def test_upload_and_aggregate(app, paillier_keys):
         "count_sum": encrypt_to_hex(public_key, 1),
         "eta_sum": encrypt_to_hex(public_key, 40),
     }
+
+    start_time = time.time()
     upload_homomorphic_data(app, enc_data2, public_key)
+    end_time = time.time()
+    duration = end_time - start_time
+    print(f" Operazione completata in {duration:.4f} secondi")
     # Recupero dati
     results = get_homomorphic_data(app)
     assert len(results) == 1  # deve esserci una sola riga
