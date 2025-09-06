@@ -47,20 +47,36 @@ def genera_record(pubkey):
 
 # Funzione per generare un dataset
 def genera_dataset(n, app):
-    #"http://127.0.0.1:5001/getPublicKey"
     url = "https://medguard-trustedautority.onrender.com/getPublicKey"
     data = {"username": "admin"}
-    response = requests.post(url, json=data)
-    if response.status_code == 200:
-        response_json = response.json()
-        n = int(response_json["n"])
-        pubkey = paillier.PaillierPublicKey(n)
-        print("Chiave pubblica caricata correttamente! " + str(pubkey))
-    else:
-        print("Errore durante il caricamento della chiave pubblica!")
+    try:
+        print(f"Tentativo di connessione a: {url}")
+        print(f"Dati inviati: {data}")
+        headers = {'Content-Type': 'application/json'}
+        response = requests.post(url, json=data, headers=headers, timeout=60)
+        print(f"Status code ricevuto: {response.status_code}")
+        print(f"Response text: {response.text}")
+        if response.status_code == 200:
+            response_json = response.json()
+            n = int(response_json["n"])
+            pubkey = paillier.PaillierPublicKey(n)
+            print("Chiave pubblica caricata correttamente! " + str(pubkey))
+        else:
+            print("Errore durante il caricamento della chiave pubblica!")
+            exit(1)
+
+    except requests.Timeout:
+        print("Timeout: il server non ha risposto entro 60 secondi")
         exit(1)
+    except requests.ConnectionError:
+        print("Errore di connessione: server non raggiungibile")
+        exit(1)
+    except Exception as e:
+        print(f"Errore imprevisto: {e}")
+        exit(1)
+
     for i in range(n):
-        print("Generazione record " + str(i+1) + " di " + str(n))
+        print("Generazione record " + str(i + 1) + " di " + str(n))
         record = genera_record(pubkey)
         homomorphicData.upload_homomorphic_data(app, record, pubkey)
 
