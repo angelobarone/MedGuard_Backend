@@ -1,6 +1,4 @@
 import os
-import time
-from threading import Thread
 
 import requests
 from faker import Faker
@@ -20,20 +18,8 @@ app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///medguard.db"  # uno stesso DB
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 db.init_app(app)
 
-def background_dataset_generation(num_records):
-    """Funzione che esegue la generazione del dataset in background"""
-    try:
-        print("Avvio generazione dataset in background...")
-        # Piccola pausa per assicurarsi che Flask sia avviato
-        time.sleep(5)
-        generator.genera_dataset(num_records, app)
-        print("Generazione dataset completata!")
-    except Exception as e:
-        print(f"Errore durante la generazione del dataset: {e}")
-
-
 with app.app_context():
-    if not os.path.exists("instance/medguard.db"):
+     if not os.path.exists("instance/medguard.db"):
         db.create_all()
         print("Database creato.")
         username1 = "angelo"
@@ -42,19 +28,11 @@ with app.app_context():
         for _ in range(10):
             username = fake.user_name()
             password = fake.password(length=10)
-            print(f"Creazione utente {username}, password {password}")
-            user = userModels.User(username=username)  # , clear_password=password)
+            user = userModels.User(username=username, clear_password=password)
             user.set_password(password)
             db.session.add(user)
             db.session.commit()
-
-        dataset_thread = Thread(
-            target=background_dataset_generation,
-            args=(100,),
-            daemon=True
-        )
-        dataset_thread.start()
-        print("Thread di generazione dataset avviato in background")
+        generator.genera_dataset(20, app)
 
 @app.route('/login', methods=['POST'])
 def login():
@@ -120,4 +98,3 @@ def getPublishedData():
 
 if __name__ == "__main__":
     app.run(port=5000)
-
