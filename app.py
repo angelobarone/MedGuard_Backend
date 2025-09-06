@@ -28,7 +28,7 @@ with app.app_context():
         for _ in range(10):
             username = fake.user_name()
             password = fake.password(length=10)
-            user = userModels.User(username=username, clear_password=password)
+            user = userModels.User(username=username)#, clear_password=password)
             user.set_password(password)
             db.session.add(user)
             db.session.commit()
