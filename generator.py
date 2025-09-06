@@ -72,7 +72,7 @@ def genera_dataset(n, app):
         exit(1)
 
     for i in range(n):
-        print("Generazione record " + (i + 1) + " di " + n)
+        print("Generazione record " + str(i + 1) + " di " + str(n))
         record = genera_record(pubkey)
         homomorphicData.upload_homomorphic_data(app, record, pubkey)
 
