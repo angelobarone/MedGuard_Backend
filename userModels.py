@@ -11,7 +11,7 @@ fake = Faker()
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(150), unique=True, nullable=False)
-    clear_password = db.Column(db.String(150), nullable=False)
+    #clear_password = db.Column(db.String(150), nullable=False)
     password_hash = db.Column(db.String(200), nullable=False)
     type = db.Column(db.String(1), nullable=False, default="A")
 
@@ -45,7 +45,7 @@ def create_user(app, username, password, type):
             print(f"Utente '{username}' esiste già.")
             return
 
-        user = User(username=username, clear_password=password, type=type)
+        user = User(username=username, type=type)#, clear_password=password)
         user.set_password(password)
         if type == "S":
             # "http://127.0.0.1:5001/addAuthUser"
