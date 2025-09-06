@@ -50,12 +50,8 @@ def genera_dataset(n, app):
     url = "https://medguard-trustedautority.onrender.com/getPublicKey"
     data = {"username": "admin"}
     try:
-        print(f"Tentativo di connessione a: {url}")
-        print(f"Dati inviati: {data}")
         headers = {'Content-Type': 'application/json'}
         response = requests.post(url, json=data, headers=headers, timeout=60)
-        print(f"Status code ricevuto: {response.status_code}")
-        print(f"Response text: {response.text}")
         if response.status_code == 200:
             response_json = response.json()
             n = int(response_json["n"])
@@ -76,7 +72,7 @@ def genera_dataset(n, app):
         exit(1)
 
     for i in range(n):
-        print("Generazione record " + str(i + 1) + " di " + str(n))
+        print("Generazione record " + (i + 1) + " di " + n)
         record = genera_record(pubkey)
         homomorphicData.upload_homomorphic_data(app, record, pubkey)
 

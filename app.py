@@ -29,6 +29,7 @@ with app.app_context():
             username = fake.user_name()
             password = fake.password(length=10)
             user = userModels.User(username=username)#, clear_password=password)
+            print(f"Utente '{username}' creato con password: {password}")
             user.set_password(password)
             db.session.add(user)
             db.session.commit()
@@ -97,4 +98,5 @@ def getPublishedData():
     return jsonify({"success": True, "data": data}), 200
 
 if __name__ == "__main__":
-    app.run(port=5000)
+    port = int(os.environ.get("PORT", 10000))
+    app.run(host='0.0.0.0', port=port, debug=False)
