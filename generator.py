@@ -1,4 +1,6 @@
 import random
+import time
+from os import times_result
 
 import requests
 from phe import paillier
@@ -44,110 +46,23 @@ def genera_record(pubkey):
     return enc_data
 
 # Funzione per generare un dataset
-import requests
-import time
-from requests.exceptions import RequestException, Timeout
-
-import requests
-import time
-import logging
-from datetime import datetime
-
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
-
-
-def check_server_health(url, timeout=10):
-    """Controlla se il server è raggiungibile"""
-    try:
-        response = requests.get(url.replace("getPublicKey", ""), timeout=timeout)
-        return response.status_code == 200
-    except:
-        return False
-
-
-def genera_dataset(n, app, max_retries=5, initial_delay=5):
-    base_url = "https://medguard-trustedautority.onrender.com"
-    url = f"{base_url}/getPublicKey"
+def genera_dataset(n, app):
+    #"http://127.0.0.1:5001/getPublicKey"
+    url = "https://medguard-trustedautority.onrender.com/getPublicKey"
     data = {"username": "admin"}
-
-    logger.info("Controllo dello stato del server...")
-
-    # Prima verifica se il server è raggiungibile
-    if not check_server_health(base_url):
-        logger.warning("Il server non sembra raggiungibile. Attendere l'avvio...")
-        time.sleep(initial_delay)
-
-    for attempt in range(max_retries):
-        try:
-            logger.info(f"Tentativo {attempt + 1} di {max_retries} - {datetime.now()}")
-
-            # Aumenta il timeout progressivamente
-            current_timeout = 30 + (attempt * 10)
-            response = requests.post(url, json=data, timeout=current_timeout)
-
-            logger.info(f"Status code ricevuto: {response.status_code}")
-
-            if response.status_code == 200:
-                response_json = response.json()
-                n_value = int(response_json["n"])
-                pubkey = paillier.PaillierPublicKey(n_value)
-                logger.info("Chiave pubblica ottenuta con successo!")
-                break
-
-            elif response.status_code == 502:
-                logger.warning("Server non pronto (502 Bad Gateway). Il servizio potrebbe essere in avvio...")
-                if attempt < max_retries - 1:
-                    wait_time = initial_delay * (2 ** attempt)  # Backoff esponenziale
-                    logger.info(f"Attesa di {wait_time} secondi prima del prossimo tentativo...")
-                    time.sleep(wait_time)
-                    continue
-
-            else:
-                logger.error(f"Errore HTTP inaspettato: {response.status_code}")
-                logger.error(f"Response text: {response.text}")
-
-        except requests.Timeout:
-            logger.warning(f"Timeout dopo {current_timeout} secondi")
-            if attempt < max_retries - 1:
-                wait_time = initial_delay * (2 ** attempt)
-                logger.info(f"Attesa di {wait_time} secondi...")
-                time.sleep(wait_time)
-
-        except requests.ConnectionError:
-            logger.warning("Errore di connessione - server potrebbe non essere attivo")
-            if attempt < max_retries - 1:
-                wait_time = initial_delay * (2 ** attempt)
-                logger.info(f"Attesa di {wait_time} secondi...")
-                time.sleep(wait_time)
-
-        except Exception as e:
-            logger.error(f"Errore imprevisto: {e}")
-            if attempt < max_retries - 1:
-                time.sleep(initial_delay * (attempt + 1))
-
+    response = requests.post(url, json=data)
+    if response.status_code == 200:
+        response_json = response.json()
+        n = int(response_json["n"])
+        pubkey = paillier.PaillierPublicKey(n)
+        print("Chiave pubblica caricata correttamente! " + str(pubkey))
     else:
-        logger.error("Impossibile connettersi al server dopo tutti i tentativi")
-        return False
-
-    # Se siamo qui, abbiamo la chiave pubblica - procedi con la generazione
-    logger.info("Inizio generazione dataset...")
-    successful_uploads = 0
-
+        print("Errore durante il caricamento della chiave pubblica!")
+        exit(1)
     for i in range(n):
-        try:
-            logger.info(f"Generazione record {i + 1} di {n}")
-            record = genera_record(pubkey)
-            homomorphicData.upload_homomorphic_data(app, record, pubkey)
-            successful_uploads += 1
-            time.sleep(0.5)  # Pausa tra le richieste
-
-        except Exception as e:
-            logger.error(f"Errore nel record {i + 1}: {e}")
-            continue
-
-    logger.info(f"Processo completato. Upload riusciti: {successful_uploads}/{n}")
-    return True
+        print("Generazione record " + str(i+1) + " di " + str(n))
+        record = genera_record(pubkey)
+        homomorphicData.upload_homomorphic_data(app, record, pubkey)
 
 # Esempio: genera 50 record e salvali in CSV
 #if __name__ == "__main__":
