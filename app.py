@@ -32,7 +32,7 @@ with app.app_context():
             user.set_password(password)
             db.session.add(user)
             db.session.commit()
-        generator.genera_dataset(100)
+        generator.genera_dataset(100, app)
 
 @app.route('/login', methods=['POST'])
 def login():

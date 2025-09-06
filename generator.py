@@ -2,30 +2,15 @@ import random
 
 import requests
 from phe import paillier
-from app import app
 import homomorphicData
 
 macroarea = ["Nord", "Centro", "Sud"]
-
-malattie = ["Diabete", "Ipertensione", "Asma", "Influenza", "Covid-19", "Bronchite", "Artrosi", "Gastrite", "Osteoporosi", "Dermatite"]
-
-url = "http://127.0.0.1:5001/getPublicKey"
-data = {"username": "admin"}
-
-response = requests.post(url, json=data)
-
-if response.status_code == 200:
-    response_json = response.json()
-    n = int(response_json["n"])
-    pubkey = paillier.PaillierPublicKey(n)
-    print("Chiave pubblica caricata correttamente! " + str(pubkey))
-else:
-    print("Errore durante il caricamento della chiave pubblica!")
-    exit(1)
+malattie = ["Diabete", "Ipertensione", "Asma", "Influenza", "Covid-19", "Bronchite", "Artrosi", "Gastrite",
+                "Osteoporosi", "Dermatite"]
 
 
 # Funzione per generare un record casuale
-def genera_record():
+def genera_record(pubkey):
     # Genera valori casuali
     eta_val = random.randint(1, 100)
     colesterolo_val = random.randint(120, 280)
@@ -59,13 +44,25 @@ def genera_record():
     return enc_data
 
 # Funzione per generare un dataset
-def genera_dataset(n):
+def genera_dataset(n, app):
+    #"http://127.0.0.1:5001/getPublicKey"
+    url = "https://medguard-trustedautority.onrender.com/getPublicKey"
+    data = {"username": "admin"}
+    response = requests.post(url, json=data)
+    if response.status_code == 200:
+        response_json = response.json()
+        n = int(response_json["n"])
+        pubkey = paillier.PaillierPublicKey(n)
+        print("Chiave pubblica caricata correttamente! " + str(pubkey))
+    else:
+        print("Errore durante il caricamento della chiave pubblica!")
+        exit(1)
     for i in range(n):
         print("Generazione record " + str(i+1) + " di " + str(n))
-        record = genera_record()
+        record = genera_record(pubkey)
         homomorphicData.upload_homomorphic_data(app, record, pubkey)
 
 # Esempio: genera 50 record e salvali in CSV
 if __name__ == "__main__":
-    genera_dataset(100)
+    #genera_dataset(100, app.app)
 
