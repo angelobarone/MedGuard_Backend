@@ -44,23 +44,61 @@ def genera_record(pubkey):
     return enc_data
 
 # Funzione per generare un dataset
-def genera_dataset(n, app):
-    #"http://127.0.0.1:5001/getPublicKey"
+import requests
+import time
+from requests.exceptions import RequestException, Timeout
+
+
+def genera_dataset(n, app, max_retries=3, timeout=30):
     url = "https://medguard-trustedautority.onrender.com/getPublicKey"
     data = {"username": "admin"}
-    response = requests.post(url, json=data)
-    if response.status_code == 200:
-        response_json = response.json()
-        n = int(response_json["n"])
-        pubkey = paillier.PaillierPublicKey(n)
-        print("Chiave pubblica caricata correttamente! " + str(pubkey))
+
+    # Tentativi per ottenere la chiave pubblica
+    for attempt in range(max_retries):
+        try:
+            print(f"Tentativo {attempt + 1} di connessione al server...")
+            response = requests.post(url, json=data, timeout=timeout)
+
+            if response.status_code == 200:
+                response_json = response.json()
+                n = int(response_json["n"])
+                pubkey = paillier.PaillierPublicKey(n)
+                print("Chiave pubblica caricata correttamente! " + str(pubkey))
+                break
+            else:
+                print(f"Status code: {response.status_code}")
+                if attempt < max_retries - 1:
+                    time.sleep(2 ** attempt)  # Backoff esponenziale
+
+        except Timeout:
+            print(f"Timeout nel tentativo {attempt + 1}")
+            if attempt < max_retries - 1:
+                time.sleep(2 ** attempt)
+        except RequestException as e:
+            print(f"Errore di connessione: {e}")
+            if attempt < max_retries - 1:
+                time.sleep(2 ** attempt)
+        except Exception as e:
+            print(f"Errore imprevisto: {e}")
+            if attempt < max_retries - 1:
+                time.sleep(2 ** attempt)
     else:
-        print("Errore durante il caricamento della chiave pubblica!")
+        print("Errore: impossibile connettersi al server dopo tutti i tentativi")
         exit(1)
+
+    # Generazione dei record
     for i in range(n):
-        print("Generazione record " + str(i+1) + " di " + str(n))
+        print("Generazione record " + str(i + 1) + " di " + str(n))
         record = genera_record(pubkey)
-        homomorphicData.upload_homomorphic_data(app, record, pubkey)
+
+        # Anche per l'upload aggiungi ritardi e gestione errori
+        try:
+            homomorphicData.upload_homomorphic_data(app, record, pubkey)
+            time.sleep(1)  # Piccola pausa tra le richieste
+        except Exception as e:
+            print(f"Errore durante l'upload del record {i + 1}: {e}")
+            # Decide se continuare o fermarsi
+            continue
 
 # Esempio: genera 50 record e salvali in CSV
 #if __name__ == "__main__":
