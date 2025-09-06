@@ -20,7 +20,7 @@ app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///medguard.db"  # uno stesso DB
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 db.init_app(app)
 
-def background_dataset_generation(app, num_records):
+def background_dataset_generation(num_records):
     """Funzione che esegue la generazione del dataset in background"""
     try:
         print("Avvio generazione dataset in background...")
@@ -31,30 +31,30 @@ def background_dataset_generation(app, num_records):
     except Exception as e:
         print(f"Errore durante la generazione del dataset: {e}")
 
-if __name__ == "__main__":
-    with app.app_context():
-         if not os.path.exists("instance/medguard.db"):
-            db.create_all()
-            print("Database creato.")
-            username1 = "angelo"
-            password1 = "barone"
-            user = userModels.create_user(app, username1, password1, "S")
-            for _ in range(10):
-                username = fake.user_name()
-                password = fake.password(length=10)
-                print(f"Creazione utente {username}, password {password}")
-                user = userModels.User(username=username)#, clear_password=password)
-                user.set_password(password)
-                db.session.add(user)
-                db.session.commit()
-            dataset_thread = Thread(
-                target=background_dataset_generation,
-                args=(app, 100),
-                daemon=True
-            )
-            dataset_thread.start()
-            print("Thread di generazione dataset avviato in background")
-    app.run(port=5000)
+
+with app.app_context():
+    if not os.path.exists("instance/medguard.db"):
+        db.create_all()
+        print("Database creato.")
+        username1 = "angelo"
+        password1 = "barone"
+        user = userModels.create_user(app, username1, password1, "S")
+        for _ in range(10):
+            username = fake.user_name()
+            password = fake.password(length=10)
+            print(f"Creazione utente {username}, password {password}")
+            user = userModels.User(username=username)  # , clear_password=password)
+            user.set_password(password)
+            db.session.add(user)
+            db.session.commit()
+
+        dataset_thread = Thread(
+            target=background_dataset_generation,
+            args=(100,),
+            daemon=True
+        )
+        dataset_thread.start()
+        print("Thread di generazione dataset avviato in background")
 
 @app.route('/login', methods=['POST'])
 def login():
@@ -117,3 +117,7 @@ def PublishData():
 def getPublishedData():
     data = publishedData.get_data(app)
     return jsonify({"success": True, "data": data}), 200
+
+if __name__ == "__main__":
+    app.run(port=5000)
+
