@@ -14,7 +14,7 @@ from extensions import db
 app = Flask(__name__)
 fake = Faker()
 CORS(app)
-app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///medguard.db"  # uno stesso DB
+app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///medguard.db"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 db.init_app(app)
 

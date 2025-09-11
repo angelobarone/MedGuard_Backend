@@ -76,7 +76,6 @@ def genera_dataset(n, app):
         record = genera_record(pubkey)
         homomorphicData.upload_homomorphic_data(app, record, pubkey)
 
-# Esempio: genera 50 record e salvali in CSV
 #if __name__ == "__main__":
     #genera_dataset(100, app.app)
 

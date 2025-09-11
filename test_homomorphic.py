@@ -32,7 +32,6 @@ def paillier_keys():
     return public_key, private_key
 
 
-# HELPER FUNCTIONS
 def encrypt_to_hex(pk, value: int) -> str:
     return format(pk.encrypt(value).ciphertext(), 'x')
 
@@ -40,7 +39,7 @@ def decrypt_from_hex(pk, sk, hex_val: str) -> int:
     return sk.decrypt(EncryptedNumber(pk, hex_to_int(hex_val)))
 
 
-# TEST SULLA FUNZIONE BASE DI SOMMA
+#TEST SULLA FUNZIONE BASE DI SOMMA
 def test_homomorphic_sum(paillier_keys):
     public_key, private_key = paillier_keys
 
@@ -54,11 +53,11 @@ def test_homomorphic_sum(paillier_keys):
     assert decrypted == a + b
 
 
-# TEST SUL FLUSSO COMPLETO
+#TEST SUL FLUSSO COMPLETO
 def test_upload_and_aggregate(app, paillier_keys):
     public_key, private_key = paillier_keys
 
-    # Primo inserimento
+    #Primo inserimento
     enc_data1 = {
         "macroarea": "A",
         "malattia": "X",
@@ -78,7 +77,7 @@ def test_upload_and_aggregate(app, paillier_keys):
     }
 
     upload_homomorphic_data(app, enc_data1, public_key)
-    # Secondo inserimento con valori diversi
+    #Secondo inserimento con valori diversi
     enc_data2 = {
         **enc_data1,
         "count_sum": encrypt_to_hex(public_key, 1),
@@ -90,11 +89,11 @@ def test_upload_and_aggregate(app, paillier_keys):
     end_time = time.time()
     duration = end_time - start_time
     print(f" Operazione completata in {duration:.4f} secondi")
-    # Recupero dati
+
     results = get_homomorphic_data(app)
     assert len(results) == 1  # deve esserci una sola riga
     row = results[0]
-    # Validazioni con decifratura
+    #Validazioni
     assert decrypt_from_hex(public_key, private_key, row["count_sum"]) == 2
     assert decrypt_from_hex(public_key, private_key, row["eta_sum"]) == 30 + 40
     assert decrypt_from_hex(public_key, private_key, row["colesterolo_sum"]) == 200 + 200
